@@ -1,5 +1,5 @@
 {
-    "name": "devtics/laravel-helpers",
+    "name": "devtics/laravel-helpers-ge5.4",
     "description": "Clases con funcionalidad para facilitar las operaciones básicas de CRUD, Servicios Rest etc",
     "type": "libary",
     "license": "MIT",
