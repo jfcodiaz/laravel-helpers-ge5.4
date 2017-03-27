@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 
 class ApiRestController extends BaseController {    
-    use AuthorizesRequests, AuthorizesResources, DispatchesJobs, ValidatesRequests;
+    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     /**
      * Display a listing of the resource.
      *
