@@ -18,7 +18,7 @@ class Response {
         header('Pragma: public');
         header('Cache-Control: max-age=86400');
         header('Last-Modified: '.gmdate('r', time()));
-        header('Expires: '.gmdate('r', time() + 1800));  
+        header('Expires: '.gmdate('r', time() + 1800 * 30));  
     }
     public static function dataWithCacheHeaders($data, $mime){
         self::cacheHeaders();
