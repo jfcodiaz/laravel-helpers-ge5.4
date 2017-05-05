@@ -47,7 +47,7 @@ class ApiRestController extends BaseController {
         $refClass = new \ReflectionClass(static::$model);
         /* @var $obj ModelBase */
         $obj = $refClass->newInstance();
-        $obj->fill(Input::all());
+        $obj->fill($this->fixCreateInputs());
         $obj->save();
         return ['success' => true, 'model'=> $obj];
     }
@@ -86,6 +86,9 @@ class ApiRestController extends BaseController {
        throw new Exception("Formulario no implementado");
     }
     public function fixUpdateInputs(){
+        return Input::all();
+    }
+    public function fixCreateInputs(){
         return Input::all();
     }
     /**
