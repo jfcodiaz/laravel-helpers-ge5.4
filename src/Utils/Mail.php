@@ -1,6 +1,17 @@
 <?php
 namespace  DevTics\LaravelHelpers\Utils;
 use \Mail as SendEmail;
+class HelperMail {
+
+    public function embed($pathToFile) {
+        return asset($pathToFile);
+    }
+
+    public function embedData() {
+        
+    }
+
+}
 /**
  * Description of SendMail
  *
@@ -54,7 +65,7 @@ class Mail {
         }
         
         if($test) {
-//            $args['message'] = new HelperMail;
+            $args['message'] = new HelperMail;
             if($format === 'html') {
                 $bodyHTMLTest =  view($htmlView, $args);
                 return $bodyHTMLTest;
