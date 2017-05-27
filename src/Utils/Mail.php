@@ -47,7 +47,7 @@ class Mail {
                     $message->getSwiftMessage()->setBody((new \Pelago\Emogrifier($body))-> emogrify());
                     $message->from([env('EMAIL_APP') => env('EMAIL_SENDERNAME')]);
                     $to = (array)$args['to'];
-                    if($test) { 
+                    if($test || env('EMAIL_TEST')) { 
                       $to[] = env('EMAIL_TEST_DEVELOPER');
                     }
                     $message->subject(isset($args['subject'])?$args['subject']:'No Subject');
