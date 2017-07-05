@@ -1,12 +1,7 @@
 <?php
 namespace  DevTics\LaravelHelpers\Utils;
-use Illuminate\Support\Facades\File;;
-
-/**
- * Description of File
- *
- * @author Sammy Guergachi <sguergachi at gmail.com>
- */
+use Illuminate\Support\Facades\File;
+ 
 class File {
     public static function createPathIfNoExits($dirFile) {
         if(!File::exists($dirFile)) {
