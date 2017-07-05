@@ -1,0 +1,16 @@
+<?php
+namespace  DevTics\LaravelHelpers\Utils;
+use Illuminate\Support\Facades\File;;
+
+/**
+ * Description of File
+ *
+ * @author Sammy Guergachi <sguergachi at gmail.com>
+ */
+class File {
+    public function createPathIfNoExits($dirFile) {
+        if(!File::exists($dirFile)) {
+            File::makeDirectory($dirFile, env('FOLDER_UNMASK', 493), true);
+        } 
+    }
+}
