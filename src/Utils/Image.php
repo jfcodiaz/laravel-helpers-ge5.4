@@ -7,7 +7,15 @@ use Illuminate\Support\Facades\File;
  * @author jdiaz
  */
 class Image {
-    
+    public static function resizeToWidth($source, $width=100, $saveAs='jpg', $options=[]) {
+        $imagine = new \Imagine\Gd\Imagine();
+        $image = $imagine->open($source);        
+        $image->resize($image->getSize()->widen($width));        
+        if(strlen($saveAs) > 3) {
+           $image->save($saveAs, $options);
+        }
+        return $image->get('jpg', $options);
+    }
     public static function toFit ($source, $width, $height, $format = "png", $colorFill = "#000",  $opacityFill = 0, $getImagineImage = false) {
         $imagine = new \Imagine\Gd\Imagine();
         $size = new \Imagine\Image\Box($width, $height);
