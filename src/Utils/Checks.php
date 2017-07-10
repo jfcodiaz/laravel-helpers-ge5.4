@@ -13,6 +13,8 @@ class Checks {
             };            
         } else if(is_callable ($callback)) {
             $_callback = $callback;
+        } else {
+            $_callback = $callback;
         }
         return $_callback;
     }
