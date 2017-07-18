@@ -2,6 +2,15 @@
 namespace  DevTics\LaravelHelpers\Utils;
 
 class Checks {
+    public static function checkFieldNoEmpty($object, $properties) {
+        foreach($properties as $prop) {
+            if( !trim($object->{$prop}) ) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     public static function resolveCallback($callback = false, $no_error=0){
         if(is_numeric($callback)){
             $_callback = function() use ($callback) {
