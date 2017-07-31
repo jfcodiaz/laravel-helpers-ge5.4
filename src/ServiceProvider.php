@@ -12,7 +12,7 @@ class ServiceProvider extends SP {
         /* maatwebsite/exce 
         /* http://www.maatwebsite.nl/laravel-excel/docs */
         $this->app->register(\Maatwebsite\Excel\ExcelServiceProvider::class);
-        AliasLoader::getInstance()->alias(\Maatwebsite\Excel\Facades\Excel::class, 'Excel');
+        AliasLoader::getInstance()->alias('Excel', \Maatwebsite\Excel\Facades\Excel::class);
         
         /* HTMLMin */
         $this->app->register(\GrahamCampbell\HTMLMin\HTMLMinServiceProvider::class);
