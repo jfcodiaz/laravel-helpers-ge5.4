@@ -1,9 +1,9 @@
 <?php
-
-
 namespace DevTics\LaravelHelpers\Utils;
 
-class Exportable{
+use Maatwebsite\Excel\Facades\Excel; 
+
+class Exportable {
     public static function export($config, $results) {
         $keyExport = $config['keyExport'] ? $config['keyExport'] : 'export';
         if(isset($_GET[$keyExport])) {
