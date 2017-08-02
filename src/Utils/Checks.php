@@ -27,7 +27,7 @@ class Checks {
         }
         return $_callback;
     }
-    private static function check($result, $callback, $no_error) {
+    public static function check($result, $callback, $no_error) {
         $fnCallback = self::resolveCallback($callback, $no_error);
         if($result) {
             if($fnCallback) {
