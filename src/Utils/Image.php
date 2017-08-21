@@ -1,6 +1,6 @@
 <?php
 namespace  DevTics\LaravelHelpers\Utils;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\File as FacadeFile;
 /**
  * Description of ImageHelper
  *
