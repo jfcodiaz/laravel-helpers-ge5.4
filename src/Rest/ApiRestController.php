@@ -50,7 +50,7 @@ class ApiRestController extends BaseController {
             $obj = $refClass->newInstance();
             $obj->fill($this->fixCreateInputs());
             $obj->save();
-            return ['success' => true, 'model'=> $obj, 'message' => $obj->successMsjStore()];
+            return ['success' => true, 'model'=> $obj, 'message' => $this->successMsjStore()];
         });
     }
 
