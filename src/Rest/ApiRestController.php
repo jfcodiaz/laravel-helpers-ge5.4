@@ -119,10 +119,33 @@ class ApiRestController extends BaseController {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id){
-        $refMethod = new \ReflectionMethod(static::$model, 'destroy');
-        $nDestroy = $refMethod->invoke(null, [$id]);                
-        return ['success' => true, 'removeIntes'=> $nDestroy];
+    public function destroy($id) {
+        $classRef = new \ReflectionClass(static::$model);
+        $find = $classRef->getMethod('getById');
+        $obj = $find->invoke(null, $id); 
+        $type = 'hard';
+        if($obj != null) {
+            if($classRef->hasMethod('trashed')) {//soft Delete                            
+                $obj->delete();
+                $nDestroy = 1;
+                $type = 'soft';
+            } else {
+                $refMethod = new \ReflectionMethod(static::$model, 'destroy');
+                $nDestroy = $refMethod->invoke(null, [$id]);                    
+            }
+        } else {
+            $queryRef = $classRef->getMethod('query');
+            $qb = $queryRef->invoke(null);
+            $res = $qb->withTrashed()
+            ->where('id', $id)->get();           
+            if($res->count()) {
+                $res->get(0)->forceDelete();
+                $nDestroy = 1;                
+            } else {
+                abort(404);
+            }
+        }
+        return ['success' => true, 'removeIntes'=> $nDestroy, 'type'=> $type];
     }
     public function getAllForDataTables() {
         $refMeth= new \ReflectionMethod(static::$model, 'getAllForDataTables');
