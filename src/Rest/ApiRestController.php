@@ -5,8 +5,6 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Auth\Access\AuthorizesResources;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 
@@ -19,12 +17,18 @@ class ApiRestController extends BaseController {
      */
     public function index() {
         $campos = Input::get("campos");
+        if($campos ===null) {
+            $campos = Input::get("fields");
+        }
         $paginacion = Input::get("paginacion");
+        if($paginacion === null) {
+            $paginacion = Input::get("pagination");
+        }
         if($paginacion == "false") {
             $refMethod = new \ReflectionMethod(static::$model, 'getAll'); 
             return $refMethod->invokeArgs(null, [$campos]);
         } 
-        $refMethod = new \ReflectionMethod(static::$model, 'paginacion');        
+        $refMethod = new \ReflectionMethod(static::$model, 'pagination');        
         return $refMethod->invokeArgs(null, [\Config::get('app.entidadesPorPagina'), $campos]);
     }
 
@@ -120,32 +124,28 @@ class ApiRestController extends BaseController {
      * @return \Illuminate\Http\Response
      */
     public function destroy($id) {
-        $classRef = new \ReflectionClass(static::$model);
-        $find = $classRef->getMethod('getById');
-        $obj = $find->invoke(null, $id); 
-        $type = 'hard';
-        if($obj != null) {
-            if($classRef->hasMethod('trashed')) {//soft Delete                            
-                $obj->delete();
-                $nDestroy = 1;
-                $type = 'soft';
+        return $this->tryDo(function() use ($id) {            
+            $classRef = new \ReflectionClass(static::$model);
+            $find = $classRef->getMethod('getById');
+            $obj = $find->invoke(null, $id); 
+            $type = 'hard';
+            if($obj != null) {
+                $res = $obj->tryDeleteByUser(\Auth::user());
+                $nDestroy = $res['nDestroy'];
+                $type = $res['type'];
             } else {
-                $refMethod = new \ReflectionMethod(static::$model, 'destroy');
-                $nDestroy = $refMethod->invoke(null, [$id]);                    
+                try{
+                    $deleteTrashed = $classRef->getMethod('tryDeleteTrashedByUser');
+                    $res = $deleteTrashed->invokeArgs(null,[\Auth::user(), $id]);
+                    $nDestroy = 1;
+                } catch(\BadMethodCallException $ex) {                    
+                    if(strpos($ex->getMessage(), 'withTrashed') !== false) {
+                        abort(404, "Objeto no encotrado");
+                    }
+                }
             }
-        } else {
-            $queryRef = $classRef->getMethod('query');
-            $qb = $queryRef->invoke(null);
-            $res = $qb->withTrashed()
-            ->where('id', $id)->get();           
-            if($res->count()) {
-                $res->get(0)->forceDelete();
-                $nDestroy = 1;                
-            } else {
-                abort(404);
-            }
-        }
-        return ['success' => true, 'removeIntes'=> $nDestroy, 'type'=> $type];
+            return ['success' => true, 'removeIntes'=> $nDestroy, 'type'=> $type];
+        });
     }
     public function getAllForDataTables() {
         $refMeth= new \ReflectionMethod(static::$model, 'getAllForDataTables');
@@ -153,7 +153,7 @@ class ApiRestController extends BaseController {
     }
     protected function tryDo($callback, $httpError=400){
         try{
-            $res =  $callback();            
+            $res =  $callback();               
             if(is_array($res)) {
                 return array_merge(['success'=>true], $res);
             }
@@ -168,6 +168,10 @@ class ApiRestController extends BaseController {
             }
             
         } catch (\Exception $ex) {
+            $noFoundClass=\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class;
+            if(is_a($ex, $noFoundClass)){
+                $httpError = 404;
+            }
             return self::responseJSONErrorFromEx($ex, $httpError);
         }
     }
