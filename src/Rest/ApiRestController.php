@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 
-class ApiRestController extends BaseController {    
+class ApiRestController extends BaseController {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     /**
      * Display a listing of the resource.
@@ -25,10 +25,10 @@ class ApiRestController extends BaseController {
             $paginacion = Input::get("pagination");
         }
         if($paginacion == "false") {
-            $refMethod = new \ReflectionMethod(static::$model, 'getAll'); 
+            $refMethod = new \ReflectionMethod(static::$model, 'getAll');
             return $refMethod->invokeArgs(null, [$campos]);
-        } 
-        $refMethod = new \ReflectionMethod(static::$model, 'pagination');        
+        }
+        $refMethod = new \ReflectionMethod(static::$model, 'pagination');
         return $refMethod->invokeArgs(null, [\Config::get('app.entidadesPorPagina'), $campos]);
     }
 
@@ -47,7 +47,7 @@ class ApiRestController extends BaseController {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request) {       
+    public function store(Request $request) {
         return $this->tryDo(function() use ($request){
             $refClass = new \ReflectionClass(static::$model);
             /* @var $obj ModelBase */
@@ -58,9 +58,9 @@ class ApiRestController extends BaseController {
         });
     }
 
-    public function relation ($id, $relation) {        
+    public function relation ($id, $relation) {
         $refMetehod = new \ReflectionMethod(static::$model, 'relation');
-        $res = $refMetehod->invokeArgs(null, [$id, $relation]);        
+        $res = $refMetehod->invokeArgs(null, [$id, $relation]);
         return $res;
     }
     /**
@@ -69,15 +69,15 @@ class ApiRestController extends BaseController {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id) {        
-        
+    public function show($id) {
+
         $refMetehod = new \ReflectionMethod(static::$model, 'getById');
         $obj = $refMetehod->invoke(null, [
             $id
         ]);
         if($obj === null) {
             abort(404);
-        }        
+        }
         return $obj;
     }
 
@@ -107,7 +107,7 @@ class ApiRestController extends BaseController {
     public function update(Request $request, $id) {
          return $this->tryDo(function() use ($request, $id) {
             $refMethod = new \ReflectionMethod(static::$model, 'getById');
-            $obj  = $refMethod->invokeArgs(null, [$id]);                
+            $obj  = $refMethod->invokeArgs(null, [$id]);
             if($obj === null) {
                 abort(404);
             }
@@ -124,10 +124,10 @@ class ApiRestController extends BaseController {
      * @return \Illuminate\Http\Response
      */
     public function destroy($id) {
-        return $this->tryDo(function() use ($id) {            
+        return $this->tryDo(function() use ($id) {
             $classRef = new \ReflectionClass(static::$model);
             $find = $classRef->getMethod('getById');
-            $obj = $find->invoke(null, $id); 
+            $obj = $find->invoke(null, $id);
             $type = 'hard';
             if($obj != null) {
                 $res = $obj->tryDeleteByUser(\Auth::user());
@@ -138,7 +138,7 @@ class ApiRestController extends BaseController {
                     $deleteTrashed = $classRef->getMethod('tryDeleteTrashedByUser');
                     $res = $deleteTrashed->invokeArgs(null,[\Auth::user(), $id]);
                     $nDestroy = 1;
-                } catch(\BadMethodCallException $ex) {                    
+                } catch(\BadMethodCallException $ex) {
                     if(strpos($ex->getMessage(), 'withTrashed') !== false) {
                         abort(404, "Objeto no encotrado");
                     }
@@ -153,7 +153,7 @@ class ApiRestController extends BaseController {
     }
     protected function tryDo($callback, $httpError=400){
         try{
-            $res =  $callback();               
+            $res =  $callback();
             if(is_array($res)) {
                 return array_merge(['success'=>true], $res);
             }
@@ -166,7 +166,12 @@ class ApiRestController extends BaseController {
             if(is_string($res)){
                 return ['success' => true, 'message' => $res];
             }
-            
+
+        } catch ( \DevTics\LaravelHelpers\Exceptions\InvalidModelException  $ex) {
+           return  \Response::json([
+             'succes' => false,
+             'errors' => $ex->getErrors()
+           ])->setStatusCode(400);
         } catch (\Exception $ex) {
             $noFoundClass=\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class;
             if(is_a($ex, $noFoundClass)){
@@ -178,7 +183,7 @@ class ApiRestController extends BaseController {
     public function responseJSONErrorFromEx($ex, $httpCode = 400) {
         return $this->responseJSONError($ex->getMessage(), $ex->getCode(), $httpCode);
     }
-    
+
     public function responseJSONError($msj, $noError, $httpCodeError = 400) {
         $response = \Response::json([
             'success' => false,

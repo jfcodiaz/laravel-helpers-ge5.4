@@ -4,17 +4,17 @@ namespace DevTics\LaravelHelpers\Model\traits;
 use Carbon\Carbon;
 
 use \DevTics\LaravelHelpers\Model\ModelBase;
-    
+
 trait MethodsModelBase {
-        
-    public function checkUserCanDelete($user) {          
+
+    public function checkUserCanDelete($user) {
         if($user->isAdmin()){
             return true;
         }
         $user->isMine($this, 'user_id', ModelBase::ACTION_CHECK_THOW_EXCEPTION);
     }
-    
-    public static function tryDeleteTrashedByUser($user, $id) {        
+
+    public static function tryDeleteTrashedByUser($user, $id) {
         $refresClass = new \ReflectionClass(get_called_class());
         $queryRef = $refresClass->getMethod('query');
         $qb = $queryRef->invoke(null);
@@ -31,10 +31,10 @@ trait MethodsModelBase {
             abort(404, "Objeto no encotrado");
         }
     }
-    
+
     public function tryDeleteByUser($user) {
         $this->checkUserCanDelete($user);
-        if(method_exists($this, 'trashed')) {//soft Delete                            
+        if(method_exists($this, 'trashed')) {//soft Delete
             $this->delete();
             $nDestroy = 1;
             $type = 'soft';
@@ -48,7 +48,7 @@ trait MethodsModelBase {
             'type' => $type
         ];
     }
-   
+
     public function successMsjStore() {
         return "Success Store";
     }
@@ -63,7 +63,7 @@ trait MethodsModelBase {
             self::create($arr);
         }
     }
-    
+
     public function strDateToUTCDateTime($dateString) {
         if(is_string($dateString)) {
             $date = new \DateTime($dateString);
@@ -72,15 +72,15 @@ trait MethodsModelBase {
         }
         return $dateString;
     }
-    
+
     public function datetimeFormat($attr){
         return Carbon::createFromFormat($this->dateFormat, $this->attributes[$attr])->toW3cString();
     }
-    
+
     public static function getAllForDataTables() {
         return static::getAll();
     }
-    
+
     public static function getAll($columns=['*']) {
         return static::get($columns);
     }
@@ -117,7 +117,7 @@ trait MethodsModelBase {
         }
         return null;
     }
-        
+
     public static function getByIds($ids, $returnQuery = false) {
         $arrIds = (array)$ids;
         $query = static::whereIn('id', $arrIds);
@@ -126,8 +126,8 @@ trait MethodsModelBase {
         }
         return $query->get();
     }
-        
-    public static function relation($id, $relation) {            
+
+    public static function relation($id, $relation) {
         $whit = \Illuminate\Support\Facades\Input::get("with");
         $query = static::where('id', $id)->with($relation);
         if($whit){
@@ -150,6 +150,43 @@ trait MethodsModelBase {
         }
         return false;
     }
-        
+
+    protected function getRules () {
+
+        if($this->id==null) {
+          return $this->createRules ? $this->createRules : $this->rules;
+        }
+
+        return $this->updateRules ? $this->updateRules : $this->rules;
+    }
+
+    public function validate($data) {
+
+      $rules = $this->getRules();
+      $v = \Validator::make($data, $rules);
+
+      if($v->fails()) {
+        $this->errors = $v->errors();
+        return false;
+      }
+
+      return true;
+
+    }
+
+    public function errors() {
+
+      return $this->errors;
+
+    }
+
+    public function save(array $options = []) {
+
+      if($this->validate($this->attributes)) {
+        return parent::save($options);
+      }
+
+      throw new \DevTics\LaravelHelpers\Exceptions\InvalidModelException($this->errors, 100);
+    }
+
 }
-    

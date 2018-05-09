@@ -8,7 +8,7 @@ trait UserBase {
     /**
      * Verifica si un objeto pertenece a un usuario
      * @param type $object
-     * @param type $field 
+     * @param type $field
      * @param int $int_action int \DevTics\LaravelHelpers\Model\ModelBase::ACTION_CHECK_*
      * @return type
      */

@@ -17,19 +17,19 @@ use ElephantIO\Engine\SocketIO\Version1X;
  */
 class SocketIOClientVX1 {
     private $elephanIo = null;
-    
+
     public function __construct($url=false) {
         $this->elephanIo = self::getElephantIO($url);
     }
-    
+
     public function emmit($event, $data, $close=true){
         $r = $this->elephanIo->emit($event, $data);
-        if($close) { 
+        if($close) {
              $this->elephanIo->close();
         }
         return $r;
     }
-    
+
     public static function staticEmmit($event, $data, $returnClient=false, $url = false) {
         $obj = new SocketIOClientVX1($url);
         $r = $obj->emmit($event, $data, !$returnClient);
@@ -38,15 +38,15 @@ class SocketIOClientVX1 {
         }
         return $r;
     }
-    
+
     public static function getElephantIO($url=false){
         if(!$url) {
-            $url = env("SOCKETIO_SERVER");   
+            $url = env("SOCKETIO_SERVER");
         }
         $client = new Client(new Version1X($url));
         $client->initialize();
         return $client;
-        
+
     }
-    
+
 }
