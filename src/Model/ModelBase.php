@@ -15,4 +15,5 @@ class ModelBase extends Model {
     protected $guarded = ['id'];
     public $timestamps = false;
 
+    protected $rules = [] ;  
 }
