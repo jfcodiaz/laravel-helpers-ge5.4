@@ -167,12 +167,23 @@ class ApiRestController extends BaseController {
                 return ['success' => true, 'message' => $res];
             }
 
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
+
+            return \Response::json([
+                'success' => false,
+                'error' => true,
+                'message' => __('exceptions.modelNotFoundException')
+            ])->setStatusCode(404);
+            
         } catch ( \DevTics\LaravelHelpers\Exceptions\InvalidModelException  $ex) {
+
            return  \Response::json([
-             'succes' => false,
+             'success' => false,
+             'error' => true,
              'errors' => $ex->getErrors()
            ])->setStatusCode(400);
         } catch (\Exception $ex) {
+            dd( get_class($ex));
             $noFoundClass=\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class;
             if(is_a($ex, $noFoundClass)){
                 $httpError = 404;
