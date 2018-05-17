@@ -5,7 +5,7 @@ use Illuminate\Foundation\AliasLoader;
 
 class ServiceProvider extends SP {
     public function boot() {
-
+         $this->loadTranslationsFrom(__DIR__.'/lang','devticsHelpers');
     }
 
     public function register() {
@@ -16,7 +16,7 @@ class ServiceProvider extends SP {
 
         /* HTMLMin */
         /**
-        * @TODO: Agregrar soporte a un nuevo minificador para laravel 5.6  
+        * @TODO: Agregrar soporte a un nuevo minificador para laravel 5.6
         */
 //        $this->app->register(\GrahamCampbell\HTMLMin\HTMLMinServiceProvider::class);
 //        AliasLoader::getInstance()->alias("HTMLMin", \GrahamCampbell\HTMLMin\Facades\HTMLMin::class);
