@@ -96,33 +96,40 @@ trait MethodsModelBase {
         return [];
     }
 
-    public static function pagination($n = false, $fields = ['*']) {
-        $_n = $n ? $n : \Config::get('app.entidadesPorPagina');
-
-        return static::paginate($_n, $fields ? $fields : ['*']);
+    public static function getIndexQueryBuilder() {
+        return static::query();
     }
 
-    public static function getById($id) {
-        $query = static::where("id", $id);
+    public static function setWith($qb) {
         $whit = \Illuminate\Support\Facades\Input::get("with");
         if($whit){
             $relations = explode(",", $whit);
             foreach ($relations as $fnWith){
-                $query->with($fnWith);
+                $qb->with($fnWith);
             }
         }
-        $res = $query->get();
-        if ($res->count()) {
-            return $res->get(0);
-        }
-        return null;
+        return;
+    }
+
+    public static function pagination($n = false, $fields = ['*']) {
+        $indexQueryBuilder = static::getIndexQueryBuilder();
+        $_n = $n ? $n : \Config::get('app.entidadesPorPagina');
+        static::setWith($indexQueryBuilder);
+        return $indexQueryBuilder->paginate($_n, $fields ? $fields : ['*']);
+    }
+
+    public static function getById($id) {
+        $query = static::where("id", $id);
+        static::setWith($query);
+        return $query->first();
     }
 
     public static function getByIds($ids, $returnQuery = false) {
         $arrIds = (array)$ids;
         $query = static::whereIn('id', $arrIds);
+        static::setWith($query);
         if($returnQuery) {
-            return $returnQuery;
+            return $query;
         }
         return $query->get();
     }
