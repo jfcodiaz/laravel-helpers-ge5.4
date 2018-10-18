@@ -63,17 +63,17 @@ class Pass4Dummies {
         switch($char){
             case 'a': return self::getRandom(['A','a','4','@']);
             case 'e': return self::getRandom(['e','E','3']);
-            case 'i': return self::getRandom(['i','i','I','1','¡']);
+            case 'i': return self::getRandom(['i','i','I','1']);
             case 'o': return self::getRandom(['o','o','O','0']);
             case 'u': return self::getRandom(['u','u','V','v']);
             case '0': return self::getRandom(['0','0','o',"O"]);
-            case '1': return self::getRandom(['1','1','i',"l","I","¡"]);
-            case '3': return self::getRandom(['3','3','E']);
-            case '4': return self::getRandom(['4','4','A']);
-            case '5': return self::getRandom(['5','5','$',"s","S"]);
-            case '6': return self::getRandom(['6','6','G']);
-            case '7': return self::getRandom(['7','7','T']);
-            case '8': return self::getRandom(['8','8','B']);
+            case '1': return self::getRandom(['1','1','1','i',"l","I"]);
+            case '3': return self::getRandom(['3','3','3','E']);
+            case '4': return self::getRandom(['4','4','4','A']);
+            case '5': return self::getRandom(['5','5','5','$',"s","S"]);
+            case '6': return self::getRandom(['6','6','6','G']);
+            case '7': return self::getRandom(['7','7','7','T']);
+            case '8': return self::getRandom(['8','8','8','B']);
             case '9': return self::getRandom(['9','9','p','P']);
             default : return self::getRandom([$char, $char, strtoupper($char)]);
         }
@@ -100,12 +100,11 @@ class Pass4Dummies {
 
     // <editor-fold defaultstate="collapsed" desc="make">
     public static function make($arrWords = false) {
-        return join("",[
+        return join("", [
             self::makeWord(),
-            self::getRandom(self::$symbols),
-            self::makeWord(), 
-            self::getRandom(self::$symbols),
-            self::makeWord([rand(0, 99).""])]);
+            self::makeWord([rand(0, 99).""]),
+            self::getRandom(self::$symbols)
+        ]);
     }
     // </editor-fold>
 

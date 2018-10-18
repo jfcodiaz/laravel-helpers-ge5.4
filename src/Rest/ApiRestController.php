@@ -63,6 +63,12 @@ class ApiRestController extends BaseController {
         $res = $refMetehod->invokeArgs(null, [$id, $relation]);
         return $res;
     }
+    public static function decodeHashId($hashId) {
+        $decode = \Hashids::decode($hashId);
+        if(count($decode)) {
+            return $decode[0];
+        }
+    }
     /**
      * Display the specified resource.
      *
@@ -70,7 +76,9 @@ class ApiRestController extends BaseController {
      * @return \Illuminate\Http\Response
      */
     public function show($id) {
-
+        if(env('USE_HASHIDS')) {
+            $id = self::decodeHashId($id);
+        }
         $refMetehod = new \ReflectionMethod(static::$model, 'getById');
         $obj = $refMetehod->invoke(null, [
             $id
@@ -105,6 +113,9 @@ class ApiRestController extends BaseController {
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id) {
+        if(env('USE_HASHIDS')) {
+            $id = self::decodeHashId($id);
+        }
          return $this->tryDo(function() use ($request, $id) {
             $refMethod = new \ReflectionMethod(static::$model, 'getById');
             $obj  = $refMethod->invokeArgs(null, [$id]);
@@ -124,6 +135,9 @@ class ApiRestController extends BaseController {
      * @return \Illuminate\Http\Response
      */
     public function destroy($id) {
+        if(env('USE_HASHIDS')) {
+            $id = self::decodeHashId($id);
+        }
         return $this->tryDo(function() use ($id) {
             $classRef = new \ReflectionClass(static::$model);
             $find = $classRef->getMethod('getById');

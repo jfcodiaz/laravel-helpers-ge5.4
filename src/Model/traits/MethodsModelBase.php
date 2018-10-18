@@ -6,7 +6,35 @@ use Carbon\Carbon;
 use \DevTics\LaravelHelpers\Model\ModelBase;
 
 trait MethodsModelBase {
-
+    
+    public static function encoreHashId($id){
+        return \Hashids::encode($id);
+    }
+    
+    public static function decodeHashId($hashId) {
+        $decode = \Hashids::decode($hashId);
+        if(count($decode)) {
+            return $decode[0];
+        }
+    }
+    
+    public static function getHashIds($array){
+        $ids=[];
+        foreach($array as $v){
+            $ids[] =  self::encoreHashId($v);
+        }
+        return $ids;
+    }
+    
+    public function toArray() {
+        $arr = parent::toArray(); 
+        if(env('USE_HASHIDS')) {
+            $idFields = isset($this->idField) ? $this->idField : 'id';
+            $arr['id'] = self::encoreHashId($arr['id']);
+        }
+        return $arr;
+    }
+    
     public function checkUserCanDelete($user) {
         if($user->isAdmin()){
             return true;
@@ -81,7 +109,10 @@ trait MethodsModelBase {
         return static::getAll();
     }
 
-    public static function getAll($columns=['*']) {
+    public static function getAll($fields=['*']) {
+        $query = static::query();
+        static::setWith($query);
+        return $query->get($fields ? $fields : ['*']);
         return static::get($columns);
     }
 
