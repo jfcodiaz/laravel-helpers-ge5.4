@@ -7,11 +7,14 @@ use \DevTics\LaravelHelpers\Model\ModelBase;
 
 trait MethodsModelBase {
     
-    public static function encoreHashId($id){
-        return \Hashids::encode($id);
+    public static function encoreHashId($id) {
+        return env('USE_HASHIDS') ? \Hashids::encode($id) : $id;
     }
     
     public static function decodeHashId($hashId) {
+        if(!env('USE_HASHIDS')) { 
+            return $hashId; 
+        }
         $decode = \Hashids::decode($hashId);
         if(count($decode)) {
             return $decode[0];
@@ -19,6 +22,9 @@ trait MethodsModelBase {
     }
     
     public static function getHashIds($array){
+        if(!env('USE_HASHIDS')) { 
+            return $array; 
+        }
         $ids=[];
         foreach($array as $v){
             $ids[] =  self::encoreHashId($v);
