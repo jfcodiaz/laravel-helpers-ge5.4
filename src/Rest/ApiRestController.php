@@ -64,7 +64,7 @@ class ApiRestController extends BaseController {
         return $res;
     }
     public static function decodeHashId($hashId) {
-        $decode = \Hashids::decode($hashId);
+        $decode = env('USE_HASHIDS') ? \Hashids::decode($hashId) : $hashId;
         if(count($decode)) {
             return $decode[0];
         }

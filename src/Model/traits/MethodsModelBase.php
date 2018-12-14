@@ -73,8 +73,10 @@ trait MethodsModelBase {
             $nDestroy = 1;
             $type = 'soft';
         } else {
-            $this->destroy();
-            $nDestroy = $refMethod = new \ReflectionMethod(static::$model, 'destroy');
+//            $this->destroy();
+            $this->delete();
+            $nDestroy = 1;
+//            $nDestroy = $refMethod = new \ReflectionMethod(static::$model, 'destroy');
             $type = 'hard';
         }
         return [
